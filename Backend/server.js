@@ -6,41 +6,14 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const { Pool } = require('pg');
-require('dotenv').config(); // if you're using .env for DB config
+
 
 // === Constants ===
 const SECRET_KEY = 'mysecretkey';
 const API_PORT = 3101;
 const LOGIN_PORT = 8167;
 
-// === PostgreSQL Pool Setup ===
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'postgres',
-  database: process.env.DB_NAME || 'new_employee_db',
-  password: process.env.DB_PASSWORD || 'admin834',
-  port: process.env.DB_PORT || 5432,
-});
-
-// === Initialize Database Function ===
-const initializeDatabase = async () => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS sampledata_table (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        email VARCHAR(100) UNIQUE,
-        password VARCHAR(100)
-      );
-    `);
-    console.log('✅ Database initialized');
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error);
-  }
-};
-
-// === Call to Initialize Database ===
+// === Initialize Database ===
 initializeDatabase();
 
 // === Express App for API and WebSocket ===
@@ -55,21 +28,16 @@ apiApp.use(bodyParser.json());
 // === Login API ===
 apiApp.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const result = await pool.query(
-      'SELECT * FROM sampledata_table WHERE email = $1 AND password = $2',
-      [email, password]
-    );
-    if (result.rows.length > 0) {
-      const user = result.rows[0];
-      const token = jwt.sign({ email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-      res.json({ token });
-    } else {
-      res.status(401).json({ error: 'Invalid credentials' });
-    }
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error' });
+  const result = await pool.query(
+    'SELECT * FROM sampledata_table WHERE email = $1 AND password = $2',
+    [email, password]
+  );
+  if (result.rows.length > 0) {
+    const user = result.rows[0];
+    const token = jwt.sign({ email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+    res.json({ token });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
   }
 });
 
@@ -96,7 +64,6 @@ wss.on('connection', (ws, req) => {
       }
     });
   } catch (err) {
-    console.error('WebSocket error:', err);
     ws.close();
   }
 
