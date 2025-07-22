@@ -11,7 +11,7 @@ const path = require('path');
 // === Constants ===
 const SECRET_KEY = 'mysecretkey';
 const API_PORT = 3101;
-const LOGIN_PORT = 5511;
+const LOGIN_PORT = 8167;
 
 // === Initialize Database ===
 initializeDatabase();
@@ -22,7 +22,7 @@ const apiServer = http.createServer(apiApp);
 const wss = new WebSocket.Server({ server: apiServer });
 
 // === Middleware ===
-apiApp.use(cors({ origin: 'http://13.221.80.34:5511', credentials: true }));
+apiApp.use(cors({ origin: 'http://13.221.80.34:8167', credentials: true }));
 apiApp.use(bodyParser.json());
 
 // === Login API ===
