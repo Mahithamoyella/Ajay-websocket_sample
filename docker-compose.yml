@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: websocket_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin834
+      POSTGRES_DB: new_employee_db
+    ports:
+      - "5511:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - websocket_net
+
+  backend:
+    build: ./Backend
+    container_name: websocket_backend
+    ports:
+      - "3101:3101"
+    depends_on:
+      - postgres
+    networks:
+      - websocket_net
+
+  login:
+    build: ./login
+    container_name: websocket_login
+    ports:
+      - "8167:80"
+    depends_on:
+      - backend
+    networks:
+      - websocket_net
+
+networks:
+  websocket_net:
+    driver: bridge
+
+
