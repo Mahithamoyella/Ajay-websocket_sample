@@ -1,3 +1,8 @@
+-- Create the database (optional if already created)
+-- CREATE DATABASE new_employee_db;
+
+-- Connect to the database
+-- \c new_employee_db;
 
 -- Create the table
 CREATE TABLE IF NOT EXISTS sampledata_table (
