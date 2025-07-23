@@ -90,7 +90,7 @@
 
       const data = await res.json();
       if (data.token) {
-        receiverFrame.src = `http://44.203.253.121:8167/receiver.html?token=${data.token}`;
+        receiverFrame.src = `http://44.203.253.121:8168/receiver.html?token=${data.token}`;
       } else {
         alert('Login failed');
       }
